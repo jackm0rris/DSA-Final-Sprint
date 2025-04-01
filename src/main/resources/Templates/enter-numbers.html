@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Binary Search Tree Creator</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+  <h1>Binary Search Tree Creator</h1>
+  <form id="treeForm">
+    <div class="form-group">
+      <label for="numbers">Enter numbers (comma-separated):</label>
+      <input type="text" id="numbers" name="numbers" required placeholder="e.g., 5,3,7,2,8">
+    </div>
+    <div class="form-group">
+      <label>
+        <input type="checkbox" name="balanced" id="balanced"> Create balanced tree
+      </label>
+    </div>
+    <button type="submit">Submit</button>
+    <button type="button" onclick="window.location.href='/previous-trees'">Show Previous</button>
+  </form>
+  <div id="treeVisualization"></div>
+</div>
+
+<script>
+  document.getElementById('treeForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const visualization = document.getElementById('treeVisualization');
+    visualization.innerHTML = '<p class="loading">Processing...</p>';
+
+    const numbers = document.getElementById('numbers').value;
+    const balanced = document.getElementById('balanced').checked;
+
+    try {
+      const response = await fetch('/api/process-numbers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `numbers=${encodeURIComponent(numbers)}&balanced=${balanced}`
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || 'Server error');
+      }
+
+      const data = await response.json();
+      visualization.innerHTML = `
+            <h3>Tree Structure:</h3>
+            <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+    } catch (error) {
+      visualization.innerHTML = `
+            <div class="error">
+                <p>Error processing request:</p>
+                <p>${error.message}</p>
+            </div>
+        `;
+      console.error('Error:', error);
+    }
+  });
+</script>
+</body>
+</html>

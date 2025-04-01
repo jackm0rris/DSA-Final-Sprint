@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Previous Trees</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+  <h1>Previously Generated Trees</h1>
+  <a href="/enter-numbers">Back to Input</a>
+
+  <div th:each="tree : ${trees}">
+    <div class="tree-record">
+      <h3>Input: <span th:text="${tree.inputNumbers}"></span></h3>
+      <p>Created at: <span th:text="${#dates.format(tree.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+      <pre th:text="${tree.treeStructure}"></pre>
+    </div>
+    <hr>
+  </div>
+</div>
+</body>
+</html>
