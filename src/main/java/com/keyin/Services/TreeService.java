@@ -3,7 +3,6 @@ package com.keyin.Services;
 import com.keyin.Entities.TreeNode;
 import com.keyin.Entities.TreeRecord;
 import com.keyin.Repository.TreeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -12,17 +11,30 @@ import java.util.stream.Collectors;
 
 @Service
 public class TreeService {
+    private final TreeRepository treeRepository;
 
-    @Autowired
-    private TreeRepository treeRepository;
+    public TreeService(TreeRepository treeRepository) {
+        this.treeRepository = treeRepository;
+    }
+
+    public TreeRecord processNumbers(String numbers) {
+        List<Integer> numberList = parseNumbers(numbers);
+        TreeNode root = buildTree(numberList);
+        TreeRecord record = new TreeRecord(numbers, root);
+        return treeRepository.save(record);
+    }
+
+    private List<Integer> parseNumbers(String numbers) {
+        return Arrays.stream(numbers.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+    }
 
     public TreeNode buildTree(List<Integer> numbers) {
-        if (numbers == null || numbers.isEmpty()) return null;
-
         TreeNode root = new TreeNode(numbers.get(0));
-        for (int i = 1; i < numbers.size(); i++) {
-            insert(root, numbers.get(i));
-        }
+        numbers.subList(1, numbers.size()).forEach(n -> insert(root, n));
         return root;
     }
 
@@ -42,44 +54,15 @@ public class TreeService {
         }
     }
 
-    public String serializeTree(TreeNode root) {
-        if (root == null) return "null";
-        return String.format("{\"value\":%d,\"left\":%s,\"right\":%s}",
-                root.getValue(),
-                serializeTree(root.getLeft()),
-                serializeTree(root.getRight()));
-    }
-
-    public TreeRecord saveTree(String numbers, TreeNode root) {
-        String treeJson = serializeTree(root);
-        TreeRecord record = new TreeRecord(numbers, treeJson);
-        return treeRepository.save(record);
-    }
-
     public List<TreeRecord> getAllTrees() {
-        return treeRepository.findAllByOrderByCreatedAtDesc();
+        return treeRepository.findAll();
     }
 
-    // Bonus: Balanced BST implementation
+    public String serializeTree(TreeNode root) {
+        return "";
+    }
+
     public TreeNode buildBalancedTree(List<Integer> numbers) {
-        if (numbers == null || numbers.isEmpty()) return null;
-
-        List<Integer> sorted = numbers.stream()
-                .distinct()
-                .sorted()
-                .collect(Collectors.toList());
-
-        return buildBalancedTree(sorted, 0, sorted.size() - 1);
-    }
-
-    private TreeNode buildBalancedTree(List<Integer> sorted, int start, int end) {
-        if (start > end) return null;
-
-        int mid = (start + end) / 2;
-        TreeNode node = new TreeNode(sorted.get(mid));
-        node.setLeft(buildBalancedTree(sorted, start, mid - 1));
-        node.setRight(buildBalancedTree(sorted, mid + 1, end));
-
-        return node;
+        return null;
     }
 }
