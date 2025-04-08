@@ -2,36 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Binary Search Tree Creator</title>
+  <title>BST Creator</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div class="container">
   <h1>Binary Search Tree Creator</h1>
-  <form id="treeForm">
+  <form id="treeForm" action="/api/process-numbers" method="POST">
     <div class="form-group">
       <label for="numbers">Enter numbers (comma-separated):</label>
-      <input type="text" id="numbers" name="numbers" required placeholder="e.g., 5,3,7,2,8">
-    </div>
-    <div class="form-group">
-      <label>
-        <input type="checkbox" name="balanced" id="balanced"> Create balanced tree
-      </label>
+      <input type="text" id="numbers" name="numbers" required placeholder="5,3,7,2,8">
     </div>
     <button type="submit">Submit</button>
-    <button type="button" onclick="window.location.href='/previous-trees'">Show Previous</button>
+    <button type="button" onclick="window.location.href='/api/previous-trees'">Show Previous</button>
   </form>
   <div id="treeVisualization"></div>
 </div>
 
 <script>
-  document.getElementById('treeForm').addEventListener('submit', async function(e) {
+  document.getElementById('treeForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const visualization = document.getElementById('treeVisualization');
     visualization.innerHTML = '<p class="loading">Processing...</p>';
 
     const numbers = document.getElementById('numbers').value;
-    const balanced = document.getElementById('balanced').checked;
 
     try {
       const response = await fetch('/api/process-numbers', {
@@ -39,13 +33,10 @@
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `numbers=${encodeURIComponent(numbers)}&balanced=${balanced}`
+        body: `numbers=${encodeURIComponent(numbers)}`
       });
 
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || 'Server error');
-      }
+      if (!response.ok) throw new Error(await response.text());
 
       const data = await response.json();
       visualization.innerHTML = `
@@ -59,7 +50,6 @@
                 <p>${error.message}</p>
             </div>
         `;
-      console.error('Error:', error);
     }
   });
 </script>
