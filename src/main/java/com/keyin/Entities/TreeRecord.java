@@ -1,11 +1,7 @@
 package com.keyin.Entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-import java.util.Date;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class TreeRecord {
@@ -14,24 +10,22 @@ public class TreeRecord {
     private Long id;
 
     private String inputNumbers;
-    private String treeStructure;
-    private Date createdAt;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private TreeNode treeStructure;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public TreeRecord() {}
 
-    public TreeRecord(String inputNumbers, String treeStructure) {
+    public TreeRecord(String inputNumbers, TreeNode treeStructure) {
         this.inputNumbers = inputNumbers;
         this.treeStructure = treeStructure;
-        this.createdAt = new Date();
     }
 
-    // Getters and Setters
+    // Getters
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
     public String getInputNumbers() { return inputNumbers; }
-    public void setInputNumbers(String inputNumbers) { this.inputNumbers = inputNumbers; }
-    public String getTreeStructure() { return treeStructure; }
-    public void setTreeStructure(String treeStructure) { this.treeStructure = treeStructure; }
-    public Date getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    public TreeNode getTreeStructure() { return treeStructure; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
